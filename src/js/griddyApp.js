@@ -41,7 +41,7 @@ class GriddyApp {
     this.queryGrid_ = this.createGrid_();
     this.config_ = this.loadConfig_();
     this.queryProvider_ = null;
-    this.latestMoveId = 0;
+    this.latestMoveId_ = 0;
     this.settingsContainer_ = document.getElementById('settings-container');
     this.authorizeButton_ = document.getElementById('authorize-button');
     this.signoutButton_ = document.getElementById('signout-button');
@@ -196,6 +196,8 @@ class GriddyApp {
       setTimeout(() => {
         if (this.latestMoveId_ === moveId) {
           resolve();
+        } else {
+          reject();
         }
       }, SETTINGS_DISPLAY_TIMEOUT_MS);
     });
@@ -246,7 +248,11 @@ class GriddyApp {
 
     window.addEventListener('mousemove', () => {
       this.showSettings_();
-      this.createDisplayPromise_().then(this.hideSettings_);
+      this.createDisplayPromise_()
+          .then(() => this.hideSettings_())
+          .catch(() => {
+            // Do nothing here
+          });
     });
 
     this.authorizeButton_.addEventListener('click', () => this.auth2_.signIn());
