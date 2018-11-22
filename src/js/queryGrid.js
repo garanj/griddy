@@ -1,4 +1,5 @@
 import {OfflineQueryProvider} from './offlineQueryProvider';
+import {Palettes} from './palettes';
 import {QueryGridCell} from './queryGridCell';
 
 /**
@@ -16,14 +17,13 @@ class QueryGrid {
    * @param {number} numRows The number of rows in the grid.
    * @param {number} numCols The number of columns in the grid.optColors
    * @param {number} typingSpeed Base milliseconds between keystrokes.
-   * @param {?QueryProvider=} optQueryProvider Provider of search queries.
-   * @param {?Array.<string>=} optColors Optional list of HTML colours.
+   * @param {string} paletteName The name of the pre-defined pallete.
+   * @param {string} optColors HTML colours, for a custom palette.
    */
-  constructor(numRows, numCols, typingSpeed, optQueryProvider, optColors) {
+  constructor(numRows, numCols, typingSpeed, paletteName, optColors) {
     this.typingSpeed_ = typingSpeed;
-    this.queryProvider_ = optQueryProvider;
     this.offlineQueryProvider_ = new OfflineQueryProvider();
-    this.colors_ = optColors || DEFAULT_COLORS;
+    this.setColors(paletteName, optColors);
     this.running_ = false;
     this.isOnline_ = navigator.onLine;
     this.setSize(numRows, numCols);
@@ -225,6 +225,23 @@ class QueryGrid {
       this.isOnline_ = status;
       this.resize(this.numRows_, this.numCols_);
     }
+  }
+
+  /**
+   * Updates the cell color palette.
+   *
+   * @param {string} paletteName The name of the palette.
+   * @param {string} customColors An array of HTML colors.
+   */
+  setColors(paletteName, customColors) {
+    if (paletteName && paletteName !== '<Custom>') {
+      this.colors_ = Palettes.getHexCodesList(paletteName);
+    } else if (paletteName === '<Custom>' && customColors) {
+      this.colors_ = customColors.split(',');
+    } else {
+      this.colors_ = DEFAULT_COLORS;
+    }
+    this.resize(this.numRows_, this.numCols_);
   }
 }
 

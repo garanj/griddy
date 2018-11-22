@@ -1,3 +1,4 @@
+import {Palettes} from './palettes';
 import {QueryGrid} from './queryGrid';
 import {QueryProvider} from './queryProvider';
 import {TimerPromiseCancel} from './timerPromiseCancel';
@@ -27,6 +28,7 @@ const DEFAULT_CONFIG = {
   numCols: 3,
   typingSpeed: 9,
   documentId: '1CtTT6P2bSh5eJO_fDxOceiDQ65Mhc2-JSt7ktXM2U6I',
+  paletteName: 'Google',
 };
 
 /**
@@ -53,6 +55,9 @@ class GriddyApp {
     this.addNetworkChangeListeners_();
     this.addSliderEventListeners_();
     this.addSpreadsheetTextboxEventListener_();
+    this.addColorsTextboxEventListener_();
+    this.populatePalettesList_();
+    this.addPalettesListListener_();
 
     this.initDialog_();
 
@@ -111,12 +116,16 @@ class GriddyApp {
     const numCols = localStorage.getItem('numCols');
     const typingSpeed = localStorage.getItem('typingSpeed');
     const documentId = localStorage.getItem('documentId');
+    const customColors = localStorage.getItem('customColors');
+    const paletteName = localStorage.getItem('paletteName');
 
     return {
       numRows: numRows,
       numCols: numCols,
       typingSpeed: typingSpeed,
       documentId: documentId,
+      customColors: customColors,
+      paletteName: paletteName,
     };
   }
 
@@ -155,7 +164,8 @@ class GriddyApp {
   createGrid_() {
     this.config_ = this.loadConfig_();
     return this.queryGrid_ || new QueryGrid(this.config_.numRows,
-        this.config_.numCols, this.config_.typingSpeed);
+        this.config_.numCols, this.config_.typingSpeed,
+        this.config_.paletteName, this.config_.customColors);
   }
 
   /**
@@ -290,6 +300,25 @@ class GriddyApp {
   }
 
   /**
+   * Updates the predefined palettes selector in the settings dialog.
+   */
+  populatePalettesList_() {
+    const paletteSelector = document.getElementById('palettes');
+    const paletteName = this.config_.paletteName;
+    const paletteNames = Palettes.getPaletteNames();
+    for (const name of paletteNames) {
+      const opt = document.createElement('option');
+      if (paletteName === name) {
+        opt.setAttribute('selected', '');
+      }
+      opt.value = name;
+      opt.text = name;
+      paletteSelector.add(opt);
+    }
+    this.setCustomColorsVisibilty_();
+  }
+
+  /**
    * Adds a handler to handle changes to the textbox for the Spreadsheet ID.
    */
   addSpreadsheetTextboxEventListener_() {
@@ -301,6 +330,48 @@ class GriddyApp {
         this.loadConfig_();
         this.loadSheets_();
       }
+    });
+  }
+
+  /**
+   * Sets whether the custom colors text box should be visible.
+   */
+  setCustomColorsVisibilty_() {
+    const customColors = document.getElementById('colors-div');
+    if (this.config_.paletteName === '<Custom>') {
+      customColors.classList.remove('hidden');
+    } else {
+      customColors.classList.add('hidden');
+    }
+  }
+
+  /**
+   * Adds a listener for changes to the color palette selector.
+   */
+  addPalettesListListener_() {
+    const paletteSelector = document.getElementById('palettes');
+
+    paletteSelector.addEventListener('change', (event) => {
+      this.config_.paletteName = event.target.value;
+      this.setCustomColorsVisibilty_();
+      localStorage.setItem('paletteName', this.config_.paletteName);
+      this.queryGrid_.setColors(this.config_.paletteName,
+          this.config_.customColors);
+    });
+  }
+
+  /**
+   * Adds a listener for changes to the custom color text field.
+   */
+  addColorsTextboxEventListener_() {
+    const customColors = document.getElementById('colors-text-field');
+
+    customColors.value = this.config_.customColors || '';
+    customColors.addEventListener('change', (event) => {
+      this.config_.customColors = event.target.value;
+      localStorage.setItem('customColors', this.config_.customColors);
+      this.queryGrid_.setColors(this.config_.paletteName,
+          this.config_.customColors);
     });
   }
 
@@ -406,7 +477,8 @@ class GriddyApp {
     }
 
     this.currentTimerPromiseCancel_ = new TimerPromiseCancel();
-    this.timerPromise_(this.currentTimerPromiseCancel_).then(this.fetchSheets_);
+    this.timerPromise_(this.currentTimerPromiseCancel_)
+        .then(() => this.fetchSheets_());
   }
 
   /**

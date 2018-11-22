@@ -16,7 +16,6 @@ class QueryGridCell {
     this.grid_ = grid;
     this.lastColor_ = optLastColor || grid.getNextColor();
     this.backgroundColor_ = grid.getNextColor();
-
     this.running_ = false;
     this.direction_ = Math.floor(Math.random() * 4);
     this.createElement_();
