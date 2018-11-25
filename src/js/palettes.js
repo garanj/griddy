@@ -5,7 +5,7 @@ const PALETTES = {
   'Facebook': ['#3b5998', '#8b9dc3', '#dfe3ee', '#f7f7f7', '#fff'],
   'Bootstrap': ['#d9534f', '#f9f9f9', '#5bc0de', '#5cb85c', '#428bca'],
   'Gold': ['#a67c00', '#bf9b30', '#ffbf00', '#ffcf40', '#ffdc73'],
-  'Google ': ['#4285F4', '#0F9D58', '#F4B400', '#DB4437'],
+  'Google': ['#4285F4', '#0F9D58', '#F4B400', '#DB4437'],
   'Skin Tones': ['#8d5524', '#c68642', '#e0ac69', '#f1c27d', '#ffdbac'],
   'Pastel rainbow': ['#ffb3ba', '#ffdfba', '#ffffba', '#baffc9', '#bae1ff'],
   'Pastel': ['#e1f7d5', '#ffbdbd', '#c9c9ff', '#fff', '#f1cbff'],

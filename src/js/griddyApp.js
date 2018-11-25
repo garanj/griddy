@@ -29,6 +29,7 @@ const DEFAULT_CONFIG = {
   typingSpeed: 9,
   documentId: '1CtTT6P2bSh5eJO_fDxOceiDQ65Mhc2-JSt7ktXM2U6I',
   paletteName: 'Google',
+  textColorMode: 'Light',
 };
 
 /**
@@ -58,6 +59,8 @@ class GriddyApp {
     this.addColorsTextboxEventListener_();
     this.populatePalettesList_();
     this.addPalettesListListener_();
+    this.populateTextMode_();
+    this.addTextModeListener_();
 
     this.initDialog_();
 
@@ -65,7 +68,13 @@ class GriddyApp {
       this.showSnackbar_('Unable to load Google JS library (is you connected?)',
           SNACKBAR_ERR_TIMEOUT_MS);
     } else {
-      gapi.load('client:auth2', this.initAuth_.bind(this));
+      gapi.load('client:auth2', {
+        callback: this.initAuth_.bind(this),
+        onerror: () => {
+          this.showSnackbar_('gapi.client failed to load!',
+              SNACKBAR_ERR_TIMEOUT_MS);
+        },
+      });
     }
   }
 
@@ -118,6 +127,7 @@ class GriddyApp {
     const documentId = localStorage.getItem('documentId');
     const customColors = localStorage.getItem('customColors');
     const paletteName = localStorage.getItem('paletteName');
+    const textColorMode = localStorage.getItem('textColorMode');
 
     return {
       numRows: numRows,
@@ -126,6 +136,7 @@ class GriddyApp {
       documentId: documentId,
       customColors: customColors,
       paletteName: paletteName,
+      textColorMode: textColorMode,
     };
   }
 
@@ -165,7 +176,8 @@ class GriddyApp {
     this.config_ = this.loadConfig_();
     return this.queryGrid_ || new QueryGrid(this.config_.numRows,
         this.config_.numCols, this.config_.typingSpeed,
-        this.config_.paletteName, this.config_.customColors);
+        this.config_.paletteName, this.config_.customColors,
+        this.config_.textColorMode);
   }
 
   /**
@@ -300,6 +312,14 @@ class GriddyApp {
   }
 
   /**
+   * Updates the text mode dropdown.
+   */
+  populateTextMode_() {
+    const textModeSelector = document.getElementById('text-mode');
+    textModeSelector.value = this.config_.textColorMode || 'Light';
+  }
+
+  /**
    * Updates the predefined palettes selector in the settings dialog.
    */
   populatePalettesList_() {
@@ -357,6 +377,19 @@ class GriddyApp {
       localStorage.setItem('paletteName', this.config_.paletteName);
       this.queryGrid_.setColors(this.config_.paletteName,
           this.config_.customColors);
+    });
+  }
+
+  /**
+   * Adds a listener for changes to the text mode selector.
+   */
+  addTextModeListener_() {
+    const textModeSelector = document.getElementById('text-mode');
+
+    textModeSelector.addEventListener('change', (event) => {
+      this.config_.textColorMode = event.target.value;
+      localStorage.setItem('textColorMode', this.config_.textColorMode);
+      this.queryGrid_.setTextMode(event.target.value);
     });
   }
 

@@ -61,6 +61,10 @@ html, body {
   animation: fadein 1s;
 }
 
+.dark {
+  color: #222;
+}
+
 .flash-cursor {
   animation: 0.5s flash step-end infinite;
 }

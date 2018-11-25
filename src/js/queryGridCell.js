@@ -147,6 +147,12 @@ class QueryGridCell {
     const textContainer = document.createElement('div');
     textContainer.classList.add('grid-cell-text');
 
+    const isLight = this.isColorLight_(this.getBackgroundColor());
+    const textMode = this.grid_.getTextMode();
+    if (textMode === 'Dark' || (textMode === 'By background' && isLight)) {
+      textContainer.classList.add('dark');
+    }
+
     const textElement = document.createElement('span');
     textContainer.appendChild(textElement);
     const flashElement = document.createElement('span');
@@ -157,6 +163,22 @@ class QueryGridCell {
     cellElement.appendChild(textContainer);
     this.textElement_ = textElement;
     this.cellElement_ = cellElement;
+  }
+
+  /**
+   * Creates a new Element in the DOM for this cell.
+   *
+   * @param {string} hex HTML color
+   * @return {boolean}
+   */
+  isColorLight_(hex) {
+    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+
+    const c = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    const lu = (0.299 * parseInt(c[1], 16) + 0.587 * parseInt(c[2], 16)
+        + 0.114 * parseInt(c[3], 16)) / 255;
+    return lu > 0.5;
   }
 }
 

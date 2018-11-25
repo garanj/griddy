@@ -18,13 +18,15 @@ class QueryGrid {
    * @param {number} numCols The number of columns in the grid.optColors
    * @param {number} typingSpeed Base milliseconds between keystrokes.
    * @param {string} paletteName The name of the pre-defined pallete.
-   * @param {string} optColors HTML colours, for a custom palette.
+   * @param {string} colors HTML colours, for a custom palette.
+   * @param {string} textMode The mode for choosing text color.
    */
-  constructor(numRows, numCols, typingSpeed, paletteName, optColors) {
+  constructor(numRows, numCols, typingSpeed, paletteName, colors, textMode) {
     this.typingSpeed_ = typingSpeed;
     this.offlineQueryProvider_ = new OfflineQueryProvider();
-    this.setColors(paletteName, optColors);
+    this.setColors(paletteName, colors);
     this.running_ = false;
+    this.textMode_ = textMode;
     this.isOnline_ = navigator.onLine;
     this.setSize(numRows, numCols);
     this.startAll();
@@ -213,6 +215,24 @@ class QueryGrid {
 
     const index = Math.floor(Math.random() * this.colors_.length);
     return this.colors_[index];
+  }
+
+  /**
+   * Gets the mode for text color selection.
+   *
+   * @return {string} The mode.
+   */
+  getTextMode() {
+    return this.textMode_;
+  }
+
+  /**
+   * Sets the mode for text color selection.
+   *
+   * @param {string} textMode The mode.
+   */
+  setTextMode(textMode) {
+    this.textMode_ = textMode;
   }
 
   /**
