@@ -26,6 +26,9 @@
     <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored" id="fullscreen-button">
       <i class="material-icons" id="fullscreen-button-text-element">fullscreen</i>
     </button>
+    <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-button--disabled" id="document-button">
+      <i class="material-icons" id="document-button-text-element">playlist_add</i>
+    </button>
     <div id ="auth-button-container">
       <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent hidden" id="authorize-button">Authorize</button>
       <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent hidden" id="signout-button">Sign Out</button>
@@ -42,11 +45,6 @@
   <dialog id="dialog" class="mdl-dialog">
     <h3 class="mdl-dialog__title">Settings</h3>
     <div class="mdl-dialog__content">
-
-      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-        <input class="mdl-textfield__input" type="text" id="spreadsheet-text-field">
-        <label class="mdl-textfield__label" for="spreadsheet-text-field">Spreadsheet ID</label>
-      </div>
 
       <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
         <select class="mdl-textfield__input" id="palettes" name="palettes">

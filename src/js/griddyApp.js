@@ -10,13 +10,19 @@ import '../css/styles.css';
 const API_KEY = 'GRIDDY_API_KEY';
 // eslint-disable-next-line max-len
 const CLIENT_ID = 'GRIDDY_CLIENT_ID';
-const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
-// Milliseconds between reloading the sprseadsheet.
+// Milliseconds between reloading the spreadsheet.
 const SPREADSHEET_REFRESH_MS = 5 * 60 * 1000;
 
 // Milliseconds to show the settings buttons for, before hiding again.
 const SETTINGS_DISPLAY_TIMEOUT_MS = 2500;
+
+// Milliseconds between OAuth token expiry checks.
+const OAUTH_CHECK_MS = 60 * 1000;
+
+// Milliseconds remaining before OAuth token expiry below which to refresh.
+const MIN_TOKEN_REMAINING_MS = 5 * 60 * 1000;
 
 // Milliseconds to show snackbars for.
 const SNACKBAR_ERR_TIMEOUT_MS = 15000;
@@ -27,7 +33,7 @@ const DEFAULT_CONFIG = {
   numRows: 4,
   numCols: 3,
   typingSpeed: 9,
-  documentId: '1CtTT6P2bSh5eJO_fDxOceiDQ65Mhc2-JSt7ktXM2U6I',
+  documentId: null,
   paletteName: 'Google',
   textColorMode: 'Light',
 };
@@ -49,18 +55,20 @@ class GriddyApp {
     this.authorizeButton_ = document.getElementById('authorize-button');
     this.signoutButton_ = document.getElementById('signout-button');
     this.fullscreenButton_ = document.getElementById('fullscreen-button');
-    this.dialogButton_ = document.getElementById('settings-button'); ;
+    this.dialogButton_ = document.getElementById('settings-button');
+    this.documentButton_ = document.getElementById('document-button');
     this.currentTimerPromiseCancel_ = null;
 
     this.addWindowEventListeners_();
     this.addNetworkChangeListeners_();
     this.addSliderEventListeners_();
-    this.addSpreadsheetTextboxEventListener_();
     this.addColorsTextboxEventListener_();
     this.populatePalettesList_();
     this.addPalettesListListener_();
     this.populateTextMode_();
     this.addTextModeListener_();
+
+    this.createRefreshOAuthTimer_();
 
     this.initDialog_();
 
@@ -68,7 +76,7 @@ class GriddyApp {
       this.showSnackbar_('Unable to load Google JS library (is you connected?)',
           SNACKBAR_ERR_TIMEOUT_MS);
     } else {
-      gapi.load('client:auth2', {
+      gapi.load('client:auth2:picker', {
         callback: this.initAuth_.bind(this),
         onerror: () => {
           this.showSnackbar_('gapi.client failed to load!',
@@ -280,6 +288,7 @@ class GriddyApp {
     this.authorizeButton_.addEventListener('click', () => this.auth2_.signIn());
     this.signoutButton_.addEventListener('click', () => this.auth2_.signOut());
     this.fullscreenButton_.addEventListener('click', this.toggleFullScreen_);
+    this.documentButton_.addEventListener('click', () => this.showPicker_());
     window.addEventListener('webkitfullscreenchange',
         this.fullscreenExitHandler_, false);
   }
@@ -336,21 +345,6 @@ class GriddyApp {
       paletteSelector.add(opt);
     }
     this.setCustomColorsVisibilty_();
-  }
-
-  /**
-   * Adds a handler to handle changes to the textbox for the Spreadsheet ID.
-   */
-  addSpreadsheetTextboxEventListener_() {
-    const spreadsheetId = document.getElementById('spreadsheet-text-field');
-    spreadsheetId.value = this.config_.documentId;
-    spreadsheetId.addEventListener('change', (event) => {
-      if (event.target.value) {
-        localStorage.setItem('documentId', event.target.value);
-        this.loadConfig_();
-        this.loadSheets_();
-      }
-    });
   }
 
   /**
@@ -456,6 +450,34 @@ class GriddyApp {
   }
 
   /**
+   *
+   */
+  showPicker_() {
+    if (this.authToken_ && this.auth2_.isSignedIn.get()) {
+      const appId = CLIENT_ID.split(/-\./)[0];
+      const picker = new google.picker.PickerBuilder().
+          addView(google.picker.ViewId.SPREADSHEETS).
+          setAppId(appId).
+          setOAuthToken(this.authToken_).
+          setDeveloperKey(API_KEY).
+          setCallback(this.pickerCallback_.bind(this)).
+          build();
+      picker.setVisible(true);
+    }
+  }
+
+  /**
+   * @param {string} data
+   */
+  pickerCallback_(data) {
+    if (data.action == google.picker.Action.PICKED) {
+      this.config_.documentId = data.docs[0].id;
+      localStorage.setItem('documentId', this.config_.documentId);
+      this.fetchSheets_();
+    }
+  }
+
+  /**
    * Initialise the Google Auth library and launch loading of the spreadsheet.
    */
   initAuth_() {
@@ -464,11 +486,33 @@ class GriddyApp {
       /* eslint camelcase: 0*/
       client_id: CLIENT_ID,
       scope: SCOPES,
-    }).then(() => {
+      fetch_basic_profile: false,
+    }).then((r) => {
       this.auth2_ = gapi.auth2.getAuthInstance();
       this.auth2_.isSignedIn.listen((s) => this.updateSigninStatus_(s));
       this.updateSigninStatus_(this.auth2_.isSignedIn.get());
     });
+  }
+
+  /**
+   * Creates a periodic check to determine if to refresh OAuth, then does so.
+   */
+  createRefreshOAuthTimer_() {
+    setTimeout(() => {
+      this.createRefreshOAuthTimer_();
+      if (this.auth2_) {
+        const user = this.auth2_.currentUser.get();
+        if (user && user.isSignedIn()) {
+          const token = gapi.auth.getToken();
+          console.log(token.expires_at - new Date());
+          if (token.expires_at - new Date() < MIN_TOKEN_REMAINING_MS) {
+            user.reloadAuthResponse().then((r) => {
+              this.authToken_ = gapi.auth.getToken().access_token;
+            });
+          }
+        }
+      }
+    }, OAUTH_CHECK_MS);
   }
 
   /**
@@ -478,12 +522,17 @@ class GriddyApp {
    */
   updateSigninStatus_(isSignedIn) {
     if (isSignedIn) {
+      this.authToken_ = gapi.auth.getToken().access_token;
       this.authorizeButton_.classList.add('hidden');
       this.signoutButton_.classList.remove('hidden');
+      this.documentButton_.classList.remove('mdl-button--disabled');
+
       this.loadSheets_();
     } else {
+      this.authToken_ = null;
       this.authorizeButton_.classList.remove('hidden');
       this.signoutButton_.classList.add('hidden');
+      this.documentButton_.classList.add('mdl-button--disabled');
     }
   }
 
@@ -493,6 +542,9 @@ class GriddyApp {
    * any existing future retrievals to ensure only one is queued up.
    */
   fetchSheets_() {
+    if (!this.config_.documentId) {
+      return;
+    }
     if (navigator.onLine) {
       this.showSnackbar_('Loading spreadsheet data...');
       gapi.client.sheets.spreadsheets.get({
@@ -556,7 +608,9 @@ class GriddyApp {
    * Loads Sheets into the client library then starts the spreadsheet fetch.
    */
   loadSheets_() {
-    gapi.client.load('sheets', 'v4').then(() => this.fetchSheets_());
+    if (this.config_.documentId) {
+      gapi.client.load('sheets', 'v4').then(() => this.fetchSheets_());
+    }
   }
 }
 
