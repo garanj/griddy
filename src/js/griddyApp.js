@@ -506,7 +506,6 @@ class GriddyApp {
         const user = this.auth2_.currentUser.get();
         if (user && user.isSignedIn()) {
           const token = gapi.auth.getToken();
-          console.log(token.expires_at - new Date());
           if (token.expires_at - new Date() < MIN_TOKEN_REMAINING_MS) {
             user.reloadAuthResponse().then((r) => {
               this.authToken_ = gapi.auth.getToken().access_token;
