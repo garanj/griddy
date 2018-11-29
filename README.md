@@ -26,6 +26,13 @@ In this solution, Sheets is used as a convenient aggregation point: Different pr
 
     *   Click **Create credentials** and create a new *API key*.
     *   From the same dropdown, create also a new *OAuth client ID*.
+        *   Add `http://localhost:8080 ` as a *Authorized JavaScript origins* and *Authorized redirect URIs*.
+        *   Add also any hosts where you plan to deploy this application.
+    *   Click on **OAuth consent screen**
+        *   Add *Application name*, *support email*.
+        *   Add `https://www.googleapis.com/auth/drive.file` to *Scopes for Google APIs*
+        *   Add any domains you are hosting on to *Authorized domains*.
+        *   Click **Save**.
 
 1.  In order to build the solution, set the following environment variables:
 
@@ -62,3 +69,13 @@ In this solution, Sheets is used as a convenient aggregation point: Different pr
 ## Ads example: Search query report
 
 The [following samples](ads/) demonstrate populating the Sheet for visualisation using [Google Ads Scripts](https://developers.google.com/google-ads/scripts/).
+
+## Errors in the console
+
+Some errors may appear in the console:
+
+*   `Failed to execute 'postMessage' on 'DOMWindow'...` and `Invalid 'X-Frame-Options' header encountered ... `: These are [long-standing issues](https://groups.google.com/forum/#!msg/google-picker-api/_wF1O_3j7ZE/yfHhQTz2DPwJ) with the [Picker API](https://developers.google.com/picker/) and do not affect the functionality of the application.
+
+*   `GET https://lh3.googleusercontent.com/d/....` returns `403` error: The application uses the [`drive.file`](https://developers.google.com/drive/api/v2/about-auth#what_scope_or_scopes_does_my_app_need)
+    scope, which limits access to only files that have been opened by the application. These 403 errors result from the Picker trying to show thumbnails in the dialog for other documents which have
+    not been opened by the application, therefore no access is granted.
