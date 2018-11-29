@@ -459,6 +459,7 @@ class GriddyApp {
       const picker = new google.picker.PickerBuilder().
           addView(google.picker.ViewId.SPREADSHEETS).
           setAppId(appId).
+          setOrigin(window.location.protocol + '//' + window.location.host).
           setOAuthToken(this.authToken_).
           setDeveloperKey(API_KEY).
           setCallback(this.pickerCallback_.bind(this)).
