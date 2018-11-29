@@ -33,7 +33,6 @@ const DEFAULT_CONFIG = {
   numRows: 4,
   numCols: 3,
   typingSpeed: 9,
-  documentId: null,
   paletteName: 'Google',
   textColorMode: 'Light',
 };
@@ -137,7 +136,7 @@ class GriddyApp {
     const paletteName = localStorage.getItem('paletteName');
     const textColorMode = localStorage.getItem('textColorMode');
 
-    return {
+    const config = {
       numRows: numRows,
       numCols: numCols,
       typingSpeed: typingSpeed,
@@ -146,6 +145,7 @@ class GriddyApp {
       paletteName: paletteName,
       textColorMode: textColorMode,
     };
+    return config;
   }
 
   /**
@@ -475,7 +475,7 @@ class GriddyApp {
     if (data.action == google.picker.Action.PICKED) {
       this.config_.documentId = data.docs[0].id;
       localStorage.setItem('documentId', this.config_.documentId);
-      this.fetchSheets_();
+      this.loadSheets_();
     }
   }
 
