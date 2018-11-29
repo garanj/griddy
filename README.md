@@ -59,3 +59,7 @@ visualisation of reporting data, such as search queries, keywords, or trends obt
     ```
     ./node_modules/.bin/webpack-dev-server
     ```
+
+## Ads example: Search query report
+
+The [following samples](ads/) demonstrate populating the Sheet for visualisation using [Google Ads Scripts](https://developers.google.com/google-ads/scripts/).
