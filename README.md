@@ -30,9 +30,9 @@ visualisation of reporting data, such as search queries, keywords, or trends obt
 
 1.  In order to build the solution, set the following environment variables:
 
-    `GRIDDY_CLIENT_ID` - The *OAuth client ID* from the above step.
-    `GRIDDY_API_KEY` - The *API key* from the above step.
-    (optional) `GRIDDY_GA_ID` - A Google Analytics ID if you wish to use GA.
+    *   `GRIDDY_CLIENT_ID` - The *OAuth client ID* from the above step.
+    *   `GRIDDY_API_KEY` - The *API key* from the above step.
+    *   (optional) `GRIDDY_GA_ID` - A Google Analytics ID if you wish to use GA.
 
     This can most easily be done in a script, e.g. `creds.sh` which is already included in the `.gitignore`
 
