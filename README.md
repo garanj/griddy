@@ -8,10 +8,9 @@ Griddy provides [Google Trends Screensaver-esque](https://www.google.com/trends/
 
 You can try this out at [griddysheets.firebaseapp.com](https://griddysheets.firebaseapp.com)
 
-Once authorized, select a Google Sheet to load data from. Words are expected to be in the first Sheet, in the first column.
+Once authorized, select a Google Sheet to load data from. Words will be taken from the first column of each and every sheet in the Sheets file.
 
-In this solution, Sheets is used as a convenient aggregation point: Easily accessible via the API, and from Apps Script, including from Google Ads, it therefore allows easy
-visualisation of reporting data, such as search queries, keywords, or trends obtained from other APIs.
+In this solution, Sheets is used as a convenient aggregation point: Different processes or accounts can populate different sheets within the same file, and all be visualized. Easily accessible via the API, and from Apps Script, including from Google Ads, it therefore allows easy visualisation of reporting data, such as search queries, keywords, or trends obtained from other APIs.
 
 ## Deployment
 
