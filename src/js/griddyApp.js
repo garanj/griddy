@@ -450,7 +450,7 @@ class GriddyApp {
   }
 
   /**
-   *
+   * Displays the Drive picker.
    */
   showPicker_() {
     if (this.authToken_ && this.auth2_.isSignedIn.get()) {
@@ -467,6 +467,8 @@ class GriddyApp {
   }
 
   /**
+   * Called by the Picker dialog on close, updates the selected document.
+   *
    * @param {string} data
    */
   pickerCallback_(data) {
