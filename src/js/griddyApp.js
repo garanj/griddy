@@ -145,6 +145,7 @@ class GriddyApp {
       paletteName: paletteName,
       textColorMode: textColorMode,
     };
+    console.log(config);
     return config;
   }
 
