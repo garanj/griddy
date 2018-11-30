@@ -24,15 +24,15 @@ In this solution, Sheets is used as a convenient aggregation point: Different pr
 
 1.  Within the new Cloud project, create new credentials, under **APIs & Services**:
 
-    *   Click **Create credentials** and create a new *API key*.
-    *   From the same dropdown, create also a new *OAuth client ID*.
-        *   Add `http://localhost:8080 ` as a *Authorized JavaScript origins* and *Authorized redirect URIs*.
-        *   Add also any hosts where you plan to deploy this application.
     *   Click on **OAuth consent screen**
         *   Add *Application name*, *support email*.
         *   Add `https://www.googleapis.com/auth/drive.file` to *Scopes for Google APIs*
-        *   Add any domains you are hosting on to *Authorized domains*.
+        *   Add any domains you are hosting on to *Authorized domains*, for example if using Firebase hosting: `https://projectname.firebaseapp.com`
         *   Click **Save**.
+    *   Click **Create credentials** and create a new *API key*.
+    *   From the same dropdown, create also a new *OAuth client ID*.
+        *   Add `http://localhost:8080 ` as a *Authorized JavaScript origins* and *Authorized redirect URIs*.
+        *   Add also any hosts where you plan to deploy this application, again for example if using Firebase hosting: `https://projectname.firebaseapp.com`
 
 1.  In order to build the solution, set the following environment variables:
 

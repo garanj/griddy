@@ -54,6 +54,7 @@ module.exports = env => {
       new CleanWebpackPlugin(['dist']),
       new HtmlWebpackPlugin({
         title: 'Griddy',
+        favicon: 'src/favicon.ico',
         gaId: process.env.GRIDDY_GA_ID || 'UA-XXXXX-Z',
         template: 'index_template.html'
       }),
