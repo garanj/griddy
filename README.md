@@ -7,12 +7,15 @@ An example of using the [Sheets API](https://developers.google.com/sheets/api/) 
 ## Overview
 
 Griddy provides [Google Trends Screensaver-esque](https://www.google.com/trends/hottrends/visualize?nrow=3&ncol=4) visualisation of words and phrases, powered by the Sheets API.
+Perfect for that wallmounted screen in the office!
 
 You can try this out at [griddysheets.firebaseapp.com](https://griddysheets.firebaseapp.com)
 
 Once authorized, select a Google Sheet to load data from. Words will be taken from the first column of each and every sheet in the Sheets file.
 
 In this solution, Sheets is used as a convenient aggregation point: Different processes or accounts can populate different sheets within the same file, and all be visualized. Easily accessible via the API, and from Apps Script, including from Google Ads, it therefore allows easy visualisation of reporting data, such as search queries, keywords, or trends obtained from other APIs.
+
+![Example](griddy-animated.gif)
 
 ## Deployment
 
