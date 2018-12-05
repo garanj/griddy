@@ -6,7 +6,7 @@ import {QueryGridCell} from './queryGridCell';
  * @fileoverview Represents the grid of queries running in the browser.
  */
 const DEFAULT_COLORS = ['#4285F4', '#0F9D58', '#F4B400', '#DB4437'];
-const OFFLINE_COLORS = ['Grey', 'DarkGrey', 'LightGrey', 'WhiteSmoke'];
+const OFFLINE_COLORS = ['#808080', '#A9A9A9', '#D3D3D3', '#F5F5F5'];
 
 /**
  * Represents the grid of queries running in the browser.
